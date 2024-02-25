@@ -71,8 +71,18 @@ export class AuthService {
   }
   public hasValidToken() { return this.oauthService.hasValidAccessToken(); }
 
-  // These normally won't be exposed from a service like this, but
-  // for debugging it makes sense.
+  public loadUserProfile() {
+    this.oauthService.events
+      .pipe(filter((e) => e.type === 'token_received'))
+      .subscribe((_) => {
+        console.debug('state', this.oauthService.state);
+        this.oauthService.loadUserProfile().then(r => r);
+
+        const scopes = this.oauthService.getGrantedScopes();
+        console.debug('scopes', scopes);
+      });
+  }
+
   public get accessToken() { return this.oauthService.getAccessToken(); }
   public get refreshToken() { return this.oauthService.getRefreshToken(); }
   public get identityClaims() { return this.oauthService.getIdentityClaims(); }

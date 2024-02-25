@@ -20,15 +20,14 @@ export class AppComponent implements OnInit {
     private titleService: Title,
     private iconSetService: IconSetService,
     private authService: AuthService,
-    private oauthService: OAuthService,
   ) {
     titleService.setTitle(this.title);
     // iconSet singleton
     iconSetService.icons = { ...iconSubset };
+    // Run authentication process
     this.authService.runInitialLoginSequence();
-
     // Automatically load user profile
-    this.loadUserProfile();
+    this.authService.loadUserProfile();
   }
 
   ngOnInit(): void {
@@ -37,18 +36,6 @@ export class AppComponent implements OnInit {
         return;
       }
     });
-  }
-
-  private loadUserProfile() {
-    this.oauthService.events
-      .pipe(filter((e) => e.type === 'token_received'))
-      .subscribe((_) => {
-        console.debug('state', this.oauthService.state);
-        this.oauthService.loadUserProfile().then(r => r);
-
-        const scopes = this.oauthService.getGrantedScopes();
-        console.debug('scopes', scopes);
-      });
   }
 
 }
